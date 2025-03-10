@@ -1,0 +1,1 @@
+assert(type(MaxClients()) == "integer")

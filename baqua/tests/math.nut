@@ -1,0 +1,12 @@
+assert(math.max(0, 1) == 1)
+assert(math.max(100, 1) == 100)
+assert(math.max(100, -9) == 100)
+assert(math.max(-math.huge, math.huge) == math.huge)
+assert(math.min(0, 1) == 0)
+assert(math.min(100, 1) == 1)
+assert(math.min(100, -9) == -9)
+assert(math.min(-math.huge, math.huge) == -math.huge)
+
+assert(math.clamp(69, 1, 10) == 10)
+assert(math.clamp(-100, 1, 10) == 1)
+assert(math.clamp(5, 1, 10) == 5)

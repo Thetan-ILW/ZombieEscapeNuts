@@ -1,0 +1,48 @@
+local EntityContainer = require("sumika/entity_container")
+
+local MinigameButton = class extends EntityContainer {
+    position = null
+    angles = null
+    minigame = null
+
+    function load() {
+        SpawnEntityFromTable("prop_dynamic", {
+            model = "models/props_combine/combine_interface002.mdl",
+            solid = 6,
+            origin = position,
+            angles = angles
+        })
+
+        local button = SpawnEntityFromTable("func_button", {
+            origin = position,
+            spawnflags = 1025
+        })
+        button.SetSize(Vector(-10, -10, -10), Vector(10, 10, 10))
+        button.ValidateScriptScope()
+
+        local scope = button.GetScriptScope()
+        local _this = this
+        scope.pressed <- function () {
+            _this.pressed(activator)
+        }
+        button.ConnectOutput("OnPressed", "pressed")
+    }
+
+    function pressed(player) {
+        if (!player)
+            return
+
+        switch (this.minigame.status) {
+            case MinigameStatus.Completed:
+            case MinigameStatus.InProgress:
+                return;
+        }
+
+        local minigame = this.minigame
+        this.stage.addCoroutine(function () {
+           minigame.introSequenceAsync(player)
+        })
+    }
+}
+
+module <- MinigameButton
