@@ -1,10 +1,10 @@
-local TestStage = require("sumika/stages/test")
+local FirstStage = require("sumika/stages/first")
 local PlayerHandler = require("sumika/player_handler")
 
 local main = {
     function load() {
         this.playerHandlers <- {}
-        this.stage <- TestStage(this.playerHandlers)
+        this.stage <- FirstStage(this.playerHandlers)
         this.stage.load()
     }
 

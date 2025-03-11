@@ -73,17 +73,6 @@ class Stage {
             component.receive(event)
         }
     }
-
-    // DEPRECATED
-    function doorOpenedEffect() {
-        local player = Entities.FindByClassname(null, "player")
-        player.PrecacheSoundScript(door_opened_sound)
-        EmitSoundEx({
-            sound_name = door_opened_sound,
-            filter_type = 5
-        })
-        ScreenFade(null, 96, 255, 63, 80, 0.7, 0, 1)
-    }
 }
 
 module <- Stage

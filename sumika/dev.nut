@@ -4,6 +4,7 @@ local Parkour = require("sumika/components/parkour")
 local first_stage_parkours = require("sumika/stages/first_parkours")
 
 local dev_parkour = Parkour()
+dev_parkour.load()
 dev_parkour.spawnImmediately()
 local player = GetListenServerHost()
 

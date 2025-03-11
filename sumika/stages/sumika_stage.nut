@@ -1,7 +1,10 @@
+local Stage = require("sumika/stage")
 local PickUp = require("sumika/components/pick_up")
 local Trigger = require("sumika/components/trigger")
 
-local components = {
+local door_opened_sound = "sumika/door_open.mp3"
+
+local SumikaStage = class extends Stage {
     function Key(position, trigger_name) {
         return PickUp({
             spritePath = "sumika/sprites/pick_up_key.vmt",
@@ -14,9 +17,8 @@ local components = {
     function Weed(position) {
         return PickUp({
             spritePath = "sumika/sprites/pick_up_weed.vmt",
-            position = position + Vector(0, 0, 48),
-            color = [0.66, 0.38, 1, 1],
-            pickUpSound = "sumika/smoke_weed_everyday.mp3",
+            initialPosition = position + Vector(0, 0, 48),
+            initialColor = [0.66, 0.38, 1, 1],
             onPickUp = function(pick_up, player) {
                 EmitSoundEx({
                     sound_name = "sumika/smoke_weed_everyday.mp3",
@@ -30,9 +32,10 @@ local components = {
     function BlueArchive(position) {
         return PickUp({
             spritePath = "sumika/sprites/pick_up_blue_archive.vmt",
-            position = position + Vector(0, 0, 48),
-            color = [1, 0, 0, 1],
+            initialPosition = position + Vector(0, 0, 48),
+            initialColor = [1, 0, 0, 1],
             onPickUp = function(pick_up, player) {
+                player.PrecacheScriptSound("sumika/explosion.wav")
                 EmitSoundEx({
                     sound_name = "sumika/explosion.wav",
                     origin = player.GetOrigin()
@@ -86,15 +89,23 @@ local components = {
             }
         })
     }
+
+    function breakDoor(name) {
+        local entity = Entities.FindByName(null, name)
+        if (!entity)
+            return
+        entity.AcceptInput("Break", "", null, null)
+    }
+
+    function doorOpenedEffect() {
+        local player = Entities.FindByClassname(null, "player")
+        player.PrecacheSoundScript(door_opened_sound)
+        EmitSoundEx({
+            sound_name = door_opened_sound,
+            filter_type = 5
+        })
+        ScreenFade(null, 96, 255, 63, 80, 0.7, 0, 1)
+    }
 }
 
-/*
-function breakDoor(name) {
-    local entity = Entities.FindByName(null, name)
-    if (!entity)
-        return
-    entity.AcceptInput("Break", "", null, null)
-}
-    */
-
-module <- components
+module <- SumikaStage

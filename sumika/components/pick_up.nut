@@ -94,7 +94,7 @@ class PickUp extends EntityContainer {
         this.playerHandler.collectPickUp(this)
 
         if (this.onPickUp)
-            this.onPickUp(this, player)
+            this.onPickUp(this, player_entity)
     }
 
     function reset() {

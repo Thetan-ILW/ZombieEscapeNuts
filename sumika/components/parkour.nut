@@ -4,11 +4,13 @@ local File = require("baqua/file")
 
 class Parkour extends Component {
     spawners = null
-
     spawnedParts = 0
     partParams = null
 
-    constructor(param_list = null) {
+    // Params
+    parkourPartParams = null
+
+    function load() {
         this.spawnedParts = 0
         this.partParams = []
 
@@ -17,10 +19,10 @@ class Parkour extends Component {
         this.spawners[ParkourPart.Platform] <- TemplateSpawner(Entities.FindByName(null, "pick_up_platform_template"))
         this.spawners[ParkourPart.Wall] <- TemplateSpawner(Entities.FindByName(null, "pick_up_wall_template"))
 
-        if (!param_list)
+        if (!parkourPartParams)
             return
 
-        foreach(i, params in param_list) {
+        foreach(i, params in this.parkourPartParams) {
             local x = math.round(params[1], 16)
             local y = math.round(params[2], 16)
             local z = math.round(params[3], 16)
@@ -155,7 +157,6 @@ class Parkour extends Component {
             DebugDrawLine(start, end, 255, 0, 0, false, 1)
             return
         }
-
 
         foreach(i, part in this.partParams) {
             if (trace.enthit == part.entity) {
