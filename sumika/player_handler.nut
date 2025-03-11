@@ -1,5 +1,3 @@
-local PickUpContainer = require("sumika/pick_up_container")
-
 local quest_complete_sound = "nier_automata/pickup_quest_complete.mp3"
 
 class PlayerHandler {
@@ -37,7 +35,7 @@ class PlayerHandler {
 
         for (local i = remove_list.len() - 1; i > -1; i--) {
             local index = remove_list[i]
-            this.pickUps[index].kill()
+            this.pickUps[index].killTree()
             this.pickUps.remove(index)
         }
 
@@ -51,6 +49,14 @@ class PlayerHandler {
         }
 
         return consumed
+    }
+
+    function getUsername() {
+        return NetProps.GetPropString(this.entity, "m_szNetname")
+    }
+
+    function getSteamId() {
+        return NetProps.GetPropString(this.entity, "m_szNetworkIDString")
     }
 }
 

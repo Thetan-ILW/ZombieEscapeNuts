@@ -15,7 +15,7 @@ class Trigger extends EntityContainer {
     function load() {
         local trigger = SpawnEntityFromTable("trigger_multiple", {
             origin = this.position,
-            spawnflags = 1
+            spawnflags = 1,
         })
         local size = this.size
         trigger.SetSize(Vector(-size.x / 2, -size.y / 2, -size.z / 2), Vector(size.x / 2, size.y / 2, size.z / 2))

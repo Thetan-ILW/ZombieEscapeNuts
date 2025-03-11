@@ -17,12 +17,12 @@ class EntityContainer extends Component {
         delete this.entities[id]
     }
 
-    function kill() {
+    function killTree() {
         foreach(key, entity in this.entities) {
             entity.Kill()
-            this.entities[key] = null
         }
-        this.killed = true
+
+        base.killTree()
     }
 }
 

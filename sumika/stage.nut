@@ -1,34 +1,24 @@
+local Component = require("sumika/component")
+
 local door_opened_sound = "nier_automata/door_open.mp3"
 
-class Stage {
-    playerHandlers = null
-    components = null
+local Stage = class extends Component {
     events = null
-    coroutines = null
     currentEventIndex = 0
 
-    constructor(player_handlers) {
-        this.playerHandlers = player_handlers
-        this.components = {}
+    // Params
+    playerHandlers = null
+    entityPrefix = null
+
+    constructor(params) {
+        base.constructor(params)
         this.events = []
         this.currentEventIndex = 0
     }
 
     function load() {}
 
-    function addComponent(id, component) {
-        if (id in this.components)
-            printl(format("Replacing stage component %s. Don't do that.", id))
-
-        this.components[id] <- component
-        component.id = id
-        component.stage = this
-        component.load()
-        return component
-    }
-
     function addEvent(delay, on_complete) {
-        // TODO: Remove handled events
         events.append({
             time = Time() + delay,
             onComplete = on_complete,
@@ -47,6 +37,10 @@ class Stage {
         return this.playerHandlers[player_entity]
     }
 
+    function getStage() {
+        return this
+    }
+
     function update() {
         for (local i = this.currentEventIndex; i < this.events.len(); i++) {
             local event = this.events[i]
@@ -56,21 +50,6 @@ class Stage {
 
             event.onComplete()
             this.currentEventIndex = i + 1
-        }
-
-        foreach(key, component in this.components) {
-            if (component.killed) {
-                this.components.rawdelete(key)
-                continue
-            }
-
-            component.update()
-        }
-    }
-
-    function receive(event) {
-        foreach(component in this.components) {
-            component.receive(event)
         }
     }
 }

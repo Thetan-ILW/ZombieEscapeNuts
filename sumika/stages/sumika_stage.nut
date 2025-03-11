@@ -1,6 +1,7 @@
 local Stage = require("sumika/stage")
 local PickUp = require("sumika/components/pick_up")
 local Trigger = require("sumika/components/trigger")
+local Parkour = require("sumika/components/parkour")
 
 local door_opened_sound = "sumika/door_open.mp3"
 
@@ -60,12 +61,13 @@ local SumikaStage = class extends Stage {
     }
 
     function KeyTrigger(position, size, trigger_name, keys_to_open, on_success) {
+        local _this = this
         return Trigger({
             position = position,
             size = size,
             showBorders = true,
             onTouch = function(trigger, player_entity) {
-                local player_handler = this.stage.getPlayerHandler(player_entity)
+                local player_handler = _this.getPlayerHandler(player_entity)
                 local consumed = player_handler.consumePickUps(trigger_name)
 
                 if (consumed == 0) {
@@ -90,6 +92,24 @@ local SumikaStage = class extends Stage {
         })
     }
 
+    function addParkourWithKeys(parent, part_params, trigger_name) {
+        local parkour = parent.addChild("parkour", Parkour({
+            parkourPartParams = part_params,
+        }))
+
+        local shrine_positions = parkour.getShrinePositions()
+        local _this = this
+
+        thread.coro(function () {
+            parkour.spawnAnimatedAsync()
+            foreach(i, position in shrine_positions) {
+                parent.addChild(format("key%i", i), _this.Key(position + Vector(0, 0, -40), "door"))
+            }
+        })
+
+        return shrine_positions.len()
+    }
+
     function breakDoor(name) {
         local entity = Entities.FindByName(null, name)
         if (!entity)
@@ -105,6 +125,10 @@ local SumikaStage = class extends Stage {
             filter_type = 5
         })
         ScreenFade(null, 96, 255, 63, 80, 0.7, 0, 1)
+    }
+
+    function say(message) {
+       Say(null, message, false)
     }
 }
 

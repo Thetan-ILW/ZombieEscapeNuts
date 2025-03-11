@@ -6,17 +6,17 @@ local MinigameButton = class extends EntityContainer {
     minigame = null
 
     function load() {
-        SpawnEntityFromTable("prop_dynamic", {
+        this.addEntity("prop", SpawnEntityFromTable("prop_dynamic", {
             model = "models/props_combine/combine_interface002.mdl",
             solid = 6,
             origin = position,
             angles = angles
-        })
+        }))
 
-        local button = SpawnEntityFromTable("func_button", {
+        local button = this.addEntity("button", SpawnEntityFromTable("func_button", {
             origin = position,
             spawnflags = 1025
-        })
+        }))
         button.SetSize(Vector(-10, -10, -10), Vector(10, 10, 10))
         button.ValidateScriptScope()
 
@@ -39,9 +39,7 @@ local MinigameButton = class extends EntityContainer {
         }
 
         local minigame = this.minigame
-        this.stage.addCoroutine(function () {
-           minigame.introSequenceAsync(player)
-        })
+        thread.coro(@() minigame.introSequenceAsync(player))
     }
 }
 

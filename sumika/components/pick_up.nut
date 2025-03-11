@@ -89,7 +89,7 @@ class PickUp extends EntityContainer {
             filter_type = 4 // This player only
         })
 
-        this.playerHandler = this.stage.getPlayerHandler(player_entity)
+        this.playerHandler = this.getStage().getPlayerHandler(player_entity)
         this.followEntity = this.playerHandler.getLastPickUp() || this.playerHandler
         this.playerHandler.collectPickUp(this)
 

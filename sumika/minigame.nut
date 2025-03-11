@@ -4,8 +4,9 @@ local begin_hacking_sound = "nier_automata/hacking.mp3"
 local hacking_fail_sound = "nier_automata/hacking_fail.mp3"
 
 class Minigame extends Component {
-    stage = null
     status = MinigameStatus.None
+
+    // Params
     onComplete = null
 
     constructor(params){
@@ -23,7 +24,7 @@ class Minigame extends Component {
         })
 
         ScreenFade(player, 255, 255, 255, 255, 0.3, 0.3, 2)
-        sleep(0.3)
+        thread.sleep(0.3)
         this.addPlayer(player)
         player.SetScriptOverlayMaterial("sumika/nines_overlay.vmt")
         ScreenFade(player, 255, 255, 255, 255, 0.3, 0.3, 1)
@@ -33,7 +34,7 @@ class Minigame extends Component {
         this.status = MinigameStatus.Completed
         player.SetScriptOverlayMaterial("")
         ScreenFade(player, 255, 255, 255, 255, 0.3, 0.3, 1)
-        this.onComplete()
+        this.onComplete(player)
     }
 
     function failSequenceAsync(player) {
@@ -46,7 +47,7 @@ class Minigame extends Component {
         })
 
         player.SetScriptOverlayMaterial("effects/tvscreen_noise001a.vmt")
-        sleep(0.3)
+        thread.sleep(0.3)
         player.SetScriptOverlayMaterial("")
         ScreenFade(player, 255, 255, 255, 255, 0.3, 0.3, 1)
     }

@@ -4,12 +4,15 @@ local PlayerHandler = require("sumika/player_handler")
 local main = {
     function load() {
         this.playerHandlers <- {}
-        this.stage <- FirstStage(this.playerHandlers)
+        this.stage <- FirstStage({
+            playerHandlers = this.playerHandlers,
+            entityPrefix = "s1_"
+        })
         this.stage.load()
     }
 
     function update() {
-        this.stage.update()
+        this.stage.updateTree()
     }
 
     function addPlayerHandler(player_entity) {
@@ -49,7 +52,7 @@ local main = {
                 break
         }
 
-        this.stage.receive(event)
+        this.stage.handleEvent(event)
     }
 }
 

@@ -7,7 +7,9 @@ local Enemy = require("sumika/minigames/nines/enemy")
 local bullet_hit_sound = "nier_automata/nines_bullet_hit.mp3"
 
 class Nines extends Minigame {
+    //Params
     arena = null
+
     triangle = null
     enemies = null
 
@@ -20,11 +22,13 @@ class Nines extends Minigame {
     enemyZ = 16
     bulletZ = 8
 
-    function addPlayer(player) {
+    function load() {
         this.bullets = {}
         this.triangle = null
         this.enemies = {}
+    }
 
+    function addPlayer(player) {
         player.PrecacheScriptSound(bullet_hit_sound)
 
         local position = arena.playerSpawnPosition
@@ -61,9 +65,11 @@ class Nines extends Minigame {
             bullet.kill()
         }
 
-        this.triangle.kill()
-        this.triangle.disableCamera()
-        this.triangle = null
+        if (this.triangle) {
+            this.triangle.kill()
+            this.triangle.disableCamera()
+            this.triangle = null
+        }
     }
 
     function addBullet(bullet) {
@@ -167,16 +173,12 @@ class Nines extends Minigame {
         local player = this.triangle.player
 
         if (this.enemies.len() == 0) {
-            this.kill()
-            this.stage.addCoroutine(function() {
-                nines.outroSequenceAsync(player)
-            })
+            this.killTree()
+            thread.coro(@() nines.outroSequenceAsync(player))
         }
         else if (this.triangle.isDead) {
-            this.kill()
-            this.stage.addCoroutine(function() {
-                nines.failSequenceAsync(player)
-            })
+            this.killTree()
+            thread.coro(@() nines.failSequenceAsync(player))
         }
     }
 }

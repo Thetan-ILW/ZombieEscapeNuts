@@ -5,6 +5,7 @@ local File = require("baqua/file")
 class Parkour extends Component {
     spawners = null
     spawnedParts = 0
+    spawnPosition = null
     partParams = null
 
     // Params
@@ -19,19 +20,33 @@ class Parkour extends Component {
         this.spawners[ParkourPart.Platform] <- TemplateSpawner(Entities.FindByName(null, "pick_up_platform_template"))
         this.spawners[ParkourPart.Wall] <- TemplateSpawner(Entities.FindByName(null, "pick_up_wall_template"))
 
-        if (!parkourPartParams)
+        if (!this.parkourPartParams || this.parkourPartParams.len() == 0)
             return
+
+        local avg_x = 0
+        local avg_y = 0
+        local avg_z = 0
 
         foreach(i, params in this.parkourPartParams) {
             local x = math.round(params[1], 16)
             local y = math.round(params[2], 16)
             local z = math.round(params[3], 16)
+            avg_x += x
+            avg_y += y
+            avg_z += z
             this.partParams.append({
                 type = params[0],
                 position = Vector(x, y, z),
                 entity = null
             })
         }
+
+        local len = this.parkourPartParams.len()
+        avg_x /= len
+        avg_y /= len
+        avg_z /= len
+
+        this.spawnPosition = Vector(avg_x, avg_y, avg_z + 700)
     }
 
     function spawnPart(part_params) {
@@ -53,7 +68,6 @@ class Parkour extends Component {
         local spawn_end_time = start_time + spawn_duration
         local animation_duration = 3.0
         local animation_end_time = start_time + animation_duration
-        local spawn_position = Vector(1000, -300, 1400)
 
         while (Time() <= animation_end_time) {
             local spawn_t = (spawn_duration - (spawn_end_time - Time())) / spawn_duration
@@ -63,6 +77,7 @@ class Parkour extends Component {
 
             if(!part.entity) {
                 this.spawnPart(part)
+                part.entity.AddSolidFlags(4) // VERY DANGEROUS THING, THIS CAUSES DESYNCS EVEN ON LOCAL SERVER
             }
 
             foreach(i, part in this.partParams) {
@@ -73,8 +88,8 @@ class Parkour extends Component {
                 local duration = animation_end_time - spawn_time
                 local animation_t = (Time() - spawn_time) / duration
                 local cubicout = (1 - pow(1 - animation_t, 3))
-                local diff = part.position - spawn_position
-                local pos = spawn_position + (diff * cubicout)
+                local diff = part.position - this.spawnPosition
+                local pos = this.spawnPosition + (diff * cubicout)
                 part.entity.SetAbsOrigin(pos)
                 world.setEntityColor(part.entity, [1, 1, 1, cubicout])
             }
@@ -88,6 +103,7 @@ class Parkour extends Component {
             }
 
             part.entity.SetAbsOrigin(part.position)
+            part.entity.ClearSolidFlags()
             NetProps.SetPropInt(part.entity, "m_nRenderMode", 0)
         }
     }

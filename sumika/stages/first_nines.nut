@@ -1,10 +1,10 @@
 local Arena = require("sumika/minigames/nines/arena")
 
-local t = {}
-t.leftEntrance <- Arena()
-t.leftEntrance.playerSpawnPosition = Vector(-9216, 12864, -5056)
-t.leftEntrance.lowestZ = -5056
-t.leftEntrance.enemies = [
+local t = []
+local a = Arena()
+a.playerSpawnPosition = Vector(-9216, 12864, -5056)
+a.lowestZ = -5056
+a.enemies = [
     {
         ai = NinesEnemyAi.FollowPlayer,
         shootingPattern = NinesEnemyShootingPattern.FastStraight,
@@ -31,5 +31,6 @@ t.leftEntrance.enemies = [
         position = Vector(-8992, 13600, 0)
     }
 ]
+t.append(a)
 
 module <- t
