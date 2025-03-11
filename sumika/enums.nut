@@ -4,6 +4,12 @@ enum Team {
     Human = 3
 }
 
+enum GameEvent {
+    RoundStart,
+    PlayerSpawn,
+    PlayerDeath
+}
+
 enum ParkourPart { // Add new parts at the end pls
     Shrine = 0,
     Platform = 1,

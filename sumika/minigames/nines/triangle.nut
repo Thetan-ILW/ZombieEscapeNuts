@@ -106,11 +106,13 @@ local Triangle = class extends Character {
     function enableCamera() {
         this.camera.AcceptInput("Enable", "", this.player, null)
         NetProps.SetPropFloat(this.player, "m_flLaggedMovementValue", 0)
+        NetProps.SetPropInt(this.player, "m_Local.m_iHideHUD", 4)
     }
 
     function disableCamera() {
         this.camera.AcceptInput("Disable", "", this.player, null)
         NetProps.SetPropFloat(this.player, "m_flLaggedMovementValue", 1)
+        NetProps.SetPropInt(this.player, "m_Local.m_iHideHUD", 0)
     }
 
     function update() {

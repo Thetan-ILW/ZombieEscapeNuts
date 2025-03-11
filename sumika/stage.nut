@@ -1,12 +1,14 @@
 local door_opened_sound = "nier_automata/door_open.mp3"
 
 class Stage {
+    playerHandlers = null
     components = null
     events = null
     coroutines = null
     currentEventIndex = 0
 
-    constructor() {
+    constructor(player_handlers) {
+        this.playerHandlers = player_handlers
         this.components = {}
         this.events = []
         this.coroutines = []
@@ -42,10 +44,15 @@ class Stage {
         })
     }
 
+    // DEPRECATED
     function addCoroutine(f) {
         local coro = newthread(f)
         coro.call()
         this.coroutines.append(coro)
+    }
+
+    function getPlayerHandler(player_entity) {
+        return this.players[player_entity]
     }
 
     function update() {
@@ -76,6 +83,13 @@ class Stage {
         }
     }
 
+    function receive(event) {
+        foreach(component in this.components) {
+            component.receive(event)
+        }
+    }
+
+    // DEPRECATED
     function doorOpenedEffect() {
         local player = Entities.FindByClassname(null, "player")
         player.PrecacheSoundScript(door_opened_sound)

@@ -17,7 +17,7 @@ class Component {
 
     function load() {}
     function update() {}
-    function entityLimitReached() {}
+    function receive(event) {}
     function kill() {
         this.killed = true
     }

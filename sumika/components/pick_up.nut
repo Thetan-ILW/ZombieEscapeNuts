@@ -5,6 +5,8 @@ local pick_up_sound = "nier_automata/pickup.mp3"
 local orb_sprite_path = "sumika/sprites/pick_up_orb.vmt"
 
 class PickUp extends EntityContainer {
+    playerHandler = null
+
     pickedUp = false
     initialPosition = null
     initialColor = null
@@ -70,27 +72,23 @@ class PickUp extends EntityContainer {
         trigger.ConnectOutput("OnStartTouch", "touched")
     }
 
-    function pickUp(player) {
+    function pickUp(player_entity) {
         if (this.pickedUp)
             return
 
-        if (!player)
+        if (!player_entity)
             return
 
-        local scope = player.GetScriptScope()
-
-        if (!("pickUpContainer") in scope)
-            return
-
+        this.pickedUp = true
+        world.setEntityColor(this.orbEntity, [1, 1, 1, 1])
         EmitSoundEx({
             sound_name = pick_up_sound,
-            entity = player,
+            entity = player_entity,
             filter_type = 4 // This player only
         })
 
-        world.setEntityColor(this.orbEntity, [1, 1, 1, 1])
-        scope.pickUpContainer.add(this)
-        this.pickedUp = true
+        local player = this.stage.getPlayerHandler(player_entity)
+        player.collectPickUp(this)
 
         if (this.onPickUp)
             this.onPickUp(this, player)
