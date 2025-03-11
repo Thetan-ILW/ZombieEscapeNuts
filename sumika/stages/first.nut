@@ -2,8 +2,6 @@ local Stage = require("sumika/stage")
 local Random = require("baqua/random")
 local TemplateSpawner = require("baqua/template_spawner")
 
-local PickUp = require("sumika/components/pick_up")
-local Trigger = require("sumika/components/trigger")
 local Parkour = require("sumika/components/parkour")
 local MinigameButton = require("sumika/components/minigame_button")
 local Nines = require("sumika/minigames/nines/init")

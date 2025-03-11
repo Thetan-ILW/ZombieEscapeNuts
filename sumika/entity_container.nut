@@ -13,6 +13,10 @@ class EntityContainer extends Component {
         return entity
     }
 
+    function removeEntity(id) {
+        delete this.entities[id]
+    }
+
     function kill() {
         foreach(key, entity in this.entities) {
             entity.Kill()

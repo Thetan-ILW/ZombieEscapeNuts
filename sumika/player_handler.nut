@@ -13,12 +13,20 @@ class PlayerHandler {
         this.pickUps = []
     }
 
-    function collectPickUp() {
-
+    function getLastPickUp() {
+        if (this.pickUps.len() != 0)
+            return this.pickUps[this.pickUps.len() - 1]
     }
 
-    function consumePickUps(key, type) {
+    function collectPickUp(pick_up) {
+        this.pickUps.append(pick_up)
+    }
 
+    function consumePickUps(trigger_name) {
+        foreach (pick_up in this.pickUps) {
+            if (pick_up.targetTrigger == trigger_name) {
+            }
+        }
     }
 }
 

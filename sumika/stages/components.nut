@@ -1,10 +1,13 @@
+local PickUp = require("sumika/components/pick_up")
+local Trigger = require("sumika/components/trigger")
+
 local components = {
-    function Key(position, trigger) {
+    function Key(position, trigger_name) {
         return PickUp({
             spritePath = "sumika/sprites/pick_up_key.vmt",
-            position = position + Vector(0, 0, 48),
-            color = [1, 0.98, 0.21, 1],
-            targetTrigger = trigger
+            initialPosition = position,
+            initialColor = [1, 0.98, 0.21, 1],
+            targetTrigger = trigger_name
         })
     }
 

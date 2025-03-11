@@ -5,6 +5,7 @@ enum Team {
 }
 
 enum GameEvent {
+    EntityLimitReached,
     RoundStart,
     PlayerSpawn,
     PlayerDeath

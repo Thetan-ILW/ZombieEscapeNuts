@@ -52,7 +52,7 @@ class Stage {
     }
 
     function getPlayerHandler(player_entity) {
-        return this.players[player_entity]
+        return this.playerHandlers[player_entity]
     }
 
     function update() {

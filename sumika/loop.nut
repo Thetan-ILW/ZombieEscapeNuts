@@ -85,3 +85,7 @@ local dev = require("sumika/dev")
 foreach(k, v in dev) {
     this[k] <- v
 }
+
+function entityLimitReached() {
+    event_pool.append(Event(GameEvent.EntityLimitReached, null))
+}

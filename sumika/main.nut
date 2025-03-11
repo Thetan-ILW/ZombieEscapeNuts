@@ -1,5 +1,5 @@
 local TestStage = require("sumika/stages/test")
-local Player = require("sumika/player")
+local PlayerHandler = require("sumika/player_handler")
 
 local main = {
     function load() {
@@ -18,19 +18,19 @@ local main = {
             return
         }
 
-        this.playerHandlers[player_entity] <- Player(player_entity)
+        this.playerHandlers[player_entity] <- PlayerHandler(player_entity)
     }
 
     function roundStarted() {
         local camera = SpawnEntityFromTable("point_viewcontrol", {})
 
         for (local i = 1; i <= MaxClients(); i++) {
-            local player = PlayerInstanceFromIndex(i)
-            if (!player)
+            local player_entity = PlayerInstanceFromIndex(i)
+            if (!player_entity)
                 continue
-            this.addPlayer(player)
-            camera.AcceptInput("Enable", "", player, player)
-            camera.AcceptInput("Disable", "", player, player)
+            this.addPlayerHandler(player_entity)
+            camera.AcceptInput("Enable", "", player_entity, player_entity)
+            camera.AcceptInput("Disable", "", player_entity, player_entity)
         }
 
         camera.Kill()
@@ -42,7 +42,7 @@ local main = {
                 local player_entity = GetPlayerFromUserID(event.data.userid)
                 this.addPlayerHandler(player_entity)
                 break
-            case GameEvent.RoundStarted:
+            case GameEvent.RoundStart:
                 this.roundStarted()
                 break
             default:

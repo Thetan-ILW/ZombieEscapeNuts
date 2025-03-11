@@ -6,41 +6,36 @@ local orb_sprite_path = "sumika/sprites/pick_up_orb.vmt"
 
 class PickUp extends EntityContainer {
     playerHandler = null
-
-    pickedUp = false
-    initialPosition = null
-    initialColor = null
+    followEntity = null
     currentPosition = null
 
+    icon = null
     orbEntity = null
     trigger = null
+
+    // Params
+    team = Team.Any
+    targetTrigger = null
+    initialPosition = null
+    initialColor = [1, 1, 1, 1]
+    spritePath = null
     onPickUp = null
     oneUse = false
+    onZombiePickedHumanItem = null
 
-    team = Team.Any
-
-    targetTrigger = null
-
-    constructor(params) {
-        base.constructor(params)
-
-        local sprite_path = params.spritePath
-        local color = params.color
-        local position = params.position
-        this.initialPosition = position
-        this.initialColor = color
+    function load() {
+        this.followEntity = null
         this.currentPosition = this.initialPosition + Vector()
-        this.pickedUp = false
 
         local player = Entities.FindByClassname(null, "player")
-        player.PrecacheModel(sprite_path)
+        player.PrecacheModel(this.spritePath)
         player.PrecacheModel(orb_sprite_path)
         player.PrecacheSoundScript(pick_up_sound)
 
-        this.addEntity("icon", SpawnEntityFromTable("env_sprite", {
+        this.icon = this.addEntity("icon", SpawnEntityFromTable("env_sprite", {
             targetname = "pickup",
-            origin = position,
-            model = sprite_path,
+            origin = this.initialPosition,
+            model = this.spritePath,
             spawnflags = 1,
             rendermode = 1,
             scale = 0.125,
@@ -48,16 +43,16 @@ class PickUp extends EntityContainer {
 
         this.orbEntity = this.addEntity("orb", SpawnEntityFromTable("env_sprite", {
             targetname = "pickup_orb",
-            origin = position,
+            origin = this.initialPosition,
             model = orb_sprite_path,
             spawnflags = 1,
             rendermode = 1,
             scale = 0.125,
         }))
-        world.setEntityColor(this.orbEntity, color)
+        world.setEntityColor(this.orbEntity, this.initialColor)
 
         local trigger = this.addEntity("trigger", SpawnEntityFromTable("trigger_multiple", {
-            origin = params.position,
+            origin = this.initialPosition,
             spawnflags = 1
         }))
         trigger.SetSize(Vector(-20, -20, -20), Vector(20, 20, 20))
@@ -73,48 +68,78 @@ class PickUp extends EntityContainer {
     }
 
     function pickUp(player_entity) {
-        if (this.pickedUp)
+        if (this.followEntity)
             return
 
         if (!player_entity)
             return
 
-        this.pickedUp = true
-        world.setEntityColor(this.orbEntity, [1, 1, 1, 1])
+        local player_team = player_entity.GetTeam()
+
+        if (this.team == Team.Zombie && player_team == Team.Human)
+            return
+
+        if (this.team == Team.Human && player_team == Team.Zombie) {
+            // Don't allow zombies to interact when human died and pick up is flying towards the initial position
+            local distance = abs(this.icon.GetOrigin() - this.initialPosition)
+            if (distance > 10) {
+                return
+            }
+
+            if (this.onZombiePickedHumanItem)
+                this.onZombiePickedHumanItem()
+        }
+
+        if (this.orbEntity)
+            world.setEntityColor(this.orbEntity, [1, 1, 1, 1])
+
         EmitSoundEx({
             sound_name = pick_up_sound,
             entity = player_entity,
             filter_type = 4 // This player only
         })
 
-        local player = this.stage.getPlayerHandler(player_entity)
-        player.collectPickUp(this)
+        this.playerHandler = this.stage.getPlayerHandler(player_entity)
+        this.followEntity = this.playerHandler.getLastPickUp() || this.playerHandler
+        this.playerHandler.collectPickUp(this)
 
         if (this.onPickUp)
             this.onPickUp(this, player)
     }
 
     function reset() {
-        this.pickedUp = false
+        this.followEntity = null
 
-        foreach (entity in this.entities) {
-            entity.SetAbsOrigin(this.initialPosition)
-            this.currentPosition = this.initialPosition + Vector()
-        }
-
-        if (this.orbEntity) {
+        if (this.orbEntity)
             world.setEntityColor(this.orbEntity, this.initialColor)
-        }
     }
 
     function update() {
-        local z = (sin(Time() * 2)) * 10
-        local r = (Time() * 360) * 0.4
-        local pos = this.currentPosition + Vector(0, 0, z)
+        local destination = this.initialPosition
+
+        if (this.followEntity) {
+            local player_angle = this.playerHandler.entity.EyeAngles()
+
+            if (this.followEntity == this.playerHandler) {
+                destination = this.playerHandler.entity.GetOrigin() + Vector(0, 0, 32)
+            }
+            else {
+                destination = this.followEntity.getPosition()
+            }
+
+            player_angle.x *= 0.1
+            destination = destination + RotatePosition(destination, player_angle, Vector(-56, 0, 0))
+        }
+
+        local diff = (destination - this.currentPosition) * 0.97
+        this.currentPosition = destination - diff
+
+        local visual_position = this.currentPosition + Vector(0, 0, sin(Time() * 2.5) * 8)
+        local angle = QAngle(0, -Time() * 75, 0)
 
         foreach (entity in this.entities) {
-            entity.SetAbsOrigin(pos)
-            entity.SetAbsAngles(QAngle(0, -r, 0))
+            entity.SetAbsOrigin(visual_position)
+            entity.SetAbsAngles(angle)
         }
     }
 
@@ -122,16 +147,12 @@ class PickUp extends EntityContainer {
         return this.currentPosition
     }
 
-    function setPosition(position) {
-        this.currentPosition = position
-        foreach (entity in this.entities) {
-            entity.SetAbsOrigin(position)
+    function receive(event) {
+        if (event.name == GameEvent.EntityLimitReached) {
+            this.orbEntity.Kill()
+            this.orbEntity = null
+            this.removeEntity("orb")
         }
-    }
-
-    function entityLimitReached() {
-        this.orbEntity.Kill()
-        delete this.entities["orb"]
     }
 }
 
