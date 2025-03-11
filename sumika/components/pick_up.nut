@@ -1,8 +1,14 @@
 local EntityContainer = require("sumika/entity_container")
-local Trigger = require("sumika/components/trigger")
 
 local pick_up_sound = "nier_automata/pickup.mp3"
 local orb_sprite_path = "sumika/sprites/pick_up_orb.vmt"
+
+local trace = {
+    start = null,
+    end = null,
+    hullmin = Vector(-20, -20, -20),
+    hullmax = Vector(20, 20, 20),
+}
 
 class PickUp extends EntityContainer {
     playerHandler = null
@@ -11,7 +17,6 @@ class PickUp extends EntityContainer {
 
     icon = null
     orbEntity = null
-    trigger = null
 
     // Params
     team = Team.Any
@@ -50,21 +55,6 @@ class PickUp extends EntityContainer {
             scale = 0.125,
         }))
         world.setEntityColor(this.orbEntity, this.initialColor)
-
-        local trigger = this.addEntity("trigger", SpawnEntityFromTable("trigger_multiple", {
-            origin = this.initialPosition,
-            spawnflags = 1
-        }))
-        trigger.SetSize(Vector(-20, -20, -20), Vector(20, 20, 20))
-        trigger.SetSolid(2)
-        trigger.ValidateScriptScope()
-
-        local trigger_scope = trigger.GetScriptScope()
-        trigger_scope.script <- this
-        trigger_scope.touched <- function() {
-            this.script.pickUp(activator)
-        }
-        trigger.ConnectOutput("OnStartTouch", "touched")
     }
 
     function pickUp(player_entity) {
@@ -115,6 +105,17 @@ class PickUp extends EntityContainer {
     }
 
     function update() {
+        if (!this.followEntity) {
+            trace.start = this.currentPosition
+            trace.end = this.currentPosition
+            TraceHull(trace)
+
+            if (trace.hit && trace.enthit.IsPlayer()) {
+                trace.hit = null
+                this.pickUp(trace.enthit)
+            }
+        }
+
         local destination = this.initialPosition
 
         if (this.followEntity) {

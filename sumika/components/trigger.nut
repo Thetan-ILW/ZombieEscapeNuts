@@ -2,19 +2,22 @@ local EntityContainer = require("sumika/entity_container")
 
 class Trigger extends EntityContainer {
     trigger = null
-    once = false
     touchedTimes = 0
     onTouch = null
     lines = null
 
-    constructor(params) {
-        base.constructor(params)
+    // Params
+    position = null
+    size = null
+    once = false
+    showBorders = false
 
+    function load() {
         local trigger = SpawnEntityFromTable("trigger_multiple", {
-            origin = params.position,
+            origin = this.position,
             spawnflags = 1
         })
-        local size = params.size
+        local size = this.size
         trigger.SetSize(Vector(-size.x / 2, -size.y / 2, -size.z / 2), Vector(size.x / 2, size.y / 2, size.z / 2))
         trigger.SetSolid(2)
         trigger.ValidateScriptScope()
@@ -28,13 +31,13 @@ class Trigger extends EntityContainer {
 
         this.trigger = this.addEntity("trigger", trigger)
 
-        if ("showBorders" in params && params.showBorders) {
+        if (this.showBorders) {
             this.lines = []
-            this.addLines(params.position, size)
+            this.addLines(this.position, size)
         }
     }
 
-    function addLines(origin, trigger_size, ) {
+    function addLines(origin, trigger_size) {
         local x = trigger_size.x / 2 - 4
         local y = trigger_size.y / 2 - 4
         local z = -trigger_size.z / 2 + 4
@@ -105,6 +108,17 @@ class Trigger extends EntityContainer {
 
     function disable(player = null) {
         this.trigger.AcceptInput("Disable", "", player, null)
+    }
+
+    function receive(event) {
+        if (event.name == GameEvent.EntityLimitReached) {
+            foreach(entity in this.lines) {
+                entity.Kill()
+            }
+
+            this.showBorders = false
+            this.lines = null
+        }
     }
 }
 

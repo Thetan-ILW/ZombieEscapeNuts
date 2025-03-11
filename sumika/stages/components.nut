@@ -43,14 +43,27 @@ local components = {
         })
     }
 
-    function MultiKeyTrigger(position, size, keys_to_open, on_success) {
+    function Trigger(position, size, on_success) {
         return Trigger({
             position = position,
             size = size,
             showBorders = true,
-            onTouch = function(trigger, player) {
-                local pick_ups = player.GetScriptScope().pickUpContainer
-                local consumed = pick_ups.consumeFor(trigger)
+            onTouch = function(trigger, player_entity) {
+                trigger.setLineColor([0.37, 1, 0.25, 1])
+                trigger.disable()
+                on_success(trigger, player_entity)
+            }
+        })
+    }
+
+    function KeyTrigger(position, size, trigger_name, keys_to_open, on_success) {
+        return Trigger({
+            position = position,
+            size = size,
+            showBorders = true,
+            onTouch = function(trigger, player_entity) {
+                local player_handler = this.stage.getPlayerHandler(player_entity)
+                local consumed = player_handler.consumePickUps(trigger_name)
 
                 if (consumed == 0) {
                     return
@@ -69,7 +82,7 @@ local components = {
 
                 trigger.setLineColor([0.37, 1, 0.25, 1])
                 trigger.disable()
-                on_success(trigger, player)
+                on_success(trigger, player_entity)
             }
         })
     }
