@@ -1,6 +1,8 @@
 IncludeScript("baqua/baqua", null)
 require("sumika/enums")
 
+thread.reset()
+
 local main = require("sumika/main")
 main.load()
 
@@ -16,6 +18,7 @@ function update() {
     }
     event_pool.clear()
 
+    thread.update()
     main.update()
 
     return -1

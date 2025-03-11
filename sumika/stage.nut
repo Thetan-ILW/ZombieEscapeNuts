@@ -11,7 +11,6 @@ class Stage {
         this.playerHandlers = player_handlers
         this.components = {}
         this.events = []
-        this.coroutines = []
         this.currentEventIndex = 0
     }
 
@@ -44,25 +43,11 @@ class Stage {
         })
     }
 
-    // DEPRECATED
-    function addCoroutine(f) {
-        local coro = newthread(f)
-        coro.call()
-        this.coroutines.append(coro)
-    }
-
     function getPlayerHandler(player_entity) {
         return this.playerHandlers[player_entity]
     }
 
     function update() {
-        foreach(i, coro in this.coroutines) {
-            if (coro.getstatus() == "suspended") {
-                coro.wakeup()
-            }
-            // Too lazy to remove dead coros xd
-        }
-
         for (local i = this.currentEventIndex; i < this.events.len(); i++) {
             local event = this.events[i]
 

@@ -16,7 +16,6 @@ local Test = class extends Stage {
             "door",
             4,
             function(trigger, player) {
-                printl("wow!")
             }
         ))
     }
