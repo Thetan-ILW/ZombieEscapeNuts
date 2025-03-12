@@ -31,18 +31,24 @@ local SumikaStage = class extends Stage {
     }
 
     function BlueArchive(position) {
+        local _this = this
+
         return PickUp({
             spritePath = "sumika/sprites/pick_up_blue_archive.vmt",
             initialPosition = position + Vector(0, 0, 48),
             initialColor = [1, 0, 0, 1],
-            onPickUp = function(pick_up, player) {
-                player.PrecacheScriptSound("sumika/explosion.wav")
+            onPickUp = function(pick_up, player_entity) {
+                player_entity.PrecacheScriptSound("sumika/explosion.wav")
                 EmitSoundEx({
                     sound_name = "sumika/explosion.wav",
-                    origin = player.GetOrigin()
+                    origin = player_entity.GetOrigin()
                 })
 
-                player.TakeDamage(999999, 1, null)
+                player_entity.TakeDamage(999999, 1, null)
+
+                local player_handler = _this.getPlayerHandler(player_entity)
+                player_handler.removePickUp(pick_up)
+                pick_up.killTree()
             }
         })
     }

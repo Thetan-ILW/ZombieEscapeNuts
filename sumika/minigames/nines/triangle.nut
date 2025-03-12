@@ -3,6 +3,7 @@ local Bullet = require("sumika/minigames/nines/bullet")
 
 local bullet_sprite = "sumika/sprites/nines_bullet.vmt"
 local bullet_fire_sound = "nier_automata/nines_fire.mp3"
+local damage_sound = "nier_automata/nines_damage.mp3"
 
 local Triangle = class extends Character {
     camera = null
@@ -29,6 +30,7 @@ local Triangle = class extends Character {
 
         PrecacheModel(bullet_sprite)
         player.PrecacheScriptSound(bullet_fire_sound)
+        player.PrecacheScriptSound(damage_sound)
 
         this.camera = SpawnEntityFromTable("point_viewcontrol", {
             spawnflags = 0,
@@ -113,6 +115,20 @@ local Triangle = class extends Character {
         this.camera.AcceptInput("Disable", "", this.player, null)
         NetProps.SetPropFloat(this.player, "m_flLaggedMovementValue", 1)
         NetProps.SetPropInt(this.player, "m_Local.m_iHideHUD", 0)
+    }
+
+    function takeHit() {
+        base.takeHit()
+
+        if (this.isDead)
+            return
+
+        ScreenFade(this.player, 255, 0, 159, 75, 0.18, 0.18, 1)
+        EmitSoundEx({
+            sound_name = damage_sound,
+            entity = this.player,
+            filter_type = 4
+        })
     }
 
     function update() {

@@ -2,6 +2,7 @@ local Component = require("sumika/component")
 
 local begin_hacking_sound = "nier_automata/hacking.mp3"
 local hacking_fail_sound = "nier_automata/hacking_fail.mp3"
+local hacking_complete_sound = "nier_automata/hacking_complete.mp3"
 
 class Minigame extends Component {
     status = MinigameStatus.None
@@ -32,6 +33,13 @@ class Minigame extends Component {
 
     function outroSequenceAsync(player) {
         this.status = MinigameStatus.Completed
+
+        player.PrecacheScriptSound(hacking_complete_sound)
+        EmitSoundEx({
+            sound_name = hacking_complete_sound,
+            entity = player,
+            filter_type = 4
+        })
         player.SetScriptOverlayMaterial("")
         ScreenFade(player, 255, 255, 255, 255, 0.3, 0.3, 1)
         this.onComplete(player)

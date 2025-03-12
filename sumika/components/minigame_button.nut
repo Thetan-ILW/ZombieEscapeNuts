@@ -28,8 +28,8 @@ local MinigameButton = class extends EntityContainer {
         button.ConnectOutput("OnPressed", "pressed")
     }
 
-    function pressed(player) {
-        if (!player)
+    function pressed(player_entity) {
+        if (!player_entity)
             return
 
         switch (this.minigame.status) {
@@ -39,7 +39,7 @@ local MinigameButton = class extends EntityContainer {
         }
 
         local minigame = this.minigame
-        thread.coro(@() minigame.introSequenceAsync(player))
+        thread.coro(@() minigame.introSequenceAsync(player_entity))
     }
 }
 

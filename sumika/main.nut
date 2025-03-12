@@ -8,7 +8,6 @@ local main = {
             playerHandlers = this.playerHandlers,
             entityPrefix = "s1_"
         })
-        this.stage.load()
     }
 
     function update() {
@@ -37,6 +36,8 @@ local main = {
         }
 
         camera.Kill()
+
+        this.stage.load()
     }
 
     function receive(event) {

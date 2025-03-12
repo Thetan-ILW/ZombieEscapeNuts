@@ -4,6 +4,7 @@ local t = []
 local a = Arena()
 a.playerSpawnPosition = Vector(-9216, 12864, -5056)
 a.lowestZ = -5056
+a.timeLimit = 40
 a.enemies = [
     {
         ai = NinesEnemyAi.FollowPlayer,

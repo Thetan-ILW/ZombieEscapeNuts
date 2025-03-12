@@ -3,7 +3,7 @@ local NotePoint = require("nchart/note_point")
 local LaserNote = require("laserchart/nchart/laser_note")
 local Random = require("baqua/random")
 
-class LaserNoteFactory extends NoteFactory {
+class LaserConvertNoteFactory extends NoteFactory {
     accumulatedNotes = 0
     previousTime = -math.huge
     random = null
@@ -78,4 +78,4 @@ class LaserNoteFactory extends NoteFactory {
     }
 }
 
-module <- LaserNoteFactory
+module <- LaserConvertNoteFactory

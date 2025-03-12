@@ -41,7 +41,7 @@ local Stage = class extends Component {
         return this
     }
 
-    function update() {
+    function updateTree() {
         for (local i = this.currentEventIndex; i < this.events.len(); i++) {
             local event = this.events[i]
 
@@ -51,6 +51,8 @@ local Stage = class extends Component {
             event.onComplete()
             this.currentEventIndex = i + 1
         }
+
+        base.updateTree()
     }
 }
 

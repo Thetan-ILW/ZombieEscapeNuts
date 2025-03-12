@@ -1,14 +1,14 @@
 local GraphicalNoteFactory = require("mania/graphic_engine/note_factory")
 
 class GraphicEngine {
-    currentTime = -math.huge
+    absoluteCurrentTime = -math.huge
+    visualCurrentTime = -math.huge
     absolutePoint = null
     visualPoint = null
 
     scrollSpeed = 4.1
     minTime = 1.0
     maxTime = 1.0
-    lerp = 0
 
     graphicalNoteFactory = null
     graphicalNotes = null
@@ -34,8 +34,9 @@ class GraphicEngine {
         this.graphicalNotes[index].state = state
     }
 
-    function setTime(time) {
-        this.currentTime = time
+    function setTime(absolute_time, visual_time) {
+        this.absoluteCurrentTime = absolute_time
+        this.visualCurrentTime = visual_time
     }
 
     function setPoints(absolute, visual) {
@@ -43,19 +44,11 @@ class GraphicEngine {
         this.visualPoint = visual
     }
 
-    function setLerp(lerp) {
-        this.lerp = lerp
-    }
-
     function update() {
-        local current_time = this.currentTime + this.lerp
+        local current_time = this.absoluteCurrentTime
+
         local spawn_time = this.minTime
         local kill_time = this.maxTime
-
-        local absolute_point = this.absolutePoint
-        local visual_point = this.visualPoint
-        local absolute_norm = (current_time - absolute_point.absoluteTime) / absolute_point.duration
-        local current_visual_time = visual_point.absoluteTime + (visual_point.duration * absolute_norm)
 
         for (local i = this.currentNoteIndex; i < this.graphicalNotes.len(); i++) {
             local note = this.graphicalNotes[i]
@@ -80,8 +73,8 @@ class GraphicEngine {
                 continue
             }
 
-            local dt = (note.getVisualTime() - current_visual_time) * this.scrollSpeed
-            local adt = (note.getAbsoluteTime() - current_time) * this.scrollSpeed
+            local dt = (note.getVisualTime() - this.visualCurrentTime) * this.scrollSpeed
+            local adt = (note.getAbsoluteTime() - this.absoluteCurrentTime) * this.scrollSpeed
             note.update(adt, dt)
         }
     }

@@ -112,12 +112,14 @@ class Trigger extends EntityContainer {
 
     function receive(event) {
         if (event.name == GameEvent.EntityLimitReached) {
-            foreach(entity in this.lines) {
-                entity.Kill()
-            }
+            if (this.lines) {
+                foreach(entity in this.lines) {
+                    entity.Kill()
+                }
 
-            this.showBorders = false
-            this.lines = null
+                this.showBorders = false
+                this.lines = null
+            }
         }
     }
 }

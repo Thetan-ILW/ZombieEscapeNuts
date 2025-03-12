@@ -22,6 +22,15 @@ class PlayerHandler {
         this.pickUps.append(pick_up)
     }
 
+    function removePickUp(pick_up) {
+        foreach(i, v in this.pickUps) {
+            if (v == pick_up) {
+                this.pickUps.remove(i)
+                return
+            }
+        }
+    }
+
     function consumePickUps(trigger_name) {
         local consumed = 0
         local remove_list = []

@@ -12,6 +12,7 @@ class Nines extends Minigame {
 
     triangle = null
     enemies = null
+    text = null
 
     bulletSpeed = 5
     enemyBulletSpeed = 3
@@ -22,6 +23,8 @@ class Nines extends Minigame {
     enemyZ = 16
     bulletZ = 8
 
+    startTime = -math.huge
+
     function load() {
         this.bullets = {}
         this.triangle = null
@@ -29,6 +32,18 @@ class Nines extends Minigame {
     }
 
     function addPlayer(player) {
+        this.text = SpawnEntityFromTable("game_text", {
+            message = "",
+            x = 0.53,
+            y = 0.53,
+            Effect = "0",
+            FadeIn = "0.25",
+            FadeOut = "0.5",
+            HoldTime = "2",
+            channel = 4,
+            color = "255 255 255"
+        })
+
         player.PrecacheScriptSound(bullet_hit_sound)
 
         local position = arena.playerSpawnPosition
@@ -55,9 +70,11 @@ class Nines extends Minigame {
                 this
             )
         }
+
+        this.startTime = Time()
     }
 
-    function kill() {
+    function clear() {
         foreach (enemy in this.enemies) {
             enemy.kill()
         }
@@ -65,11 +82,22 @@ class Nines extends Minigame {
             bullet.kill()
         }
 
+        this.enemies.clear()
+        this.bullets.clear()
+
         if (this.triangle) {
             this.triangle.kill()
             this.triangle.disableCamera()
             this.triangle = null
         }
+
+        if (this.text) {
+            this.text.Kill()
+        }
+    }
+
+    function kill() {
+        this.clear()
     }
 
     function addBullet(bullet) {
@@ -170,15 +198,20 @@ class Nines extends Minigame {
         }
 
         local nines = this
-        local player = this.triangle.player
+        local player_entity = this.triangle.player
+        local time_left = this.arena.timeLimit - (Time() - this.startTime)
 
         if (this.enemies.len() == 0) {
             this.killTree()
-            thread.coro(@() nines.outroSequenceAsync(player))
+            thread.coro(@() nines.outroSequenceAsync(player_entity))
         }
-        else if (this.triangle.isDead) {
-            this.killTree()
-            thread.coro(@() nines.failSequenceAsync(player))
+        else if (this.triangle.isDead || time_left <= 0) {
+            this.clear()
+            thread.coro(@() nines.failSequenceAsync(player_entity))
+        }
+        else {
+            this.text.KeyValueFromString("message", format("%0.02f", time_left))
+            this.text.AcceptInput("Display", "", player_entity, player_entity)
         }
     }
 }

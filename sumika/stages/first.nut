@@ -2,6 +2,7 @@ local SumikaStage = require("sumika/stages/sumika_stage")
 local Component = require("sumika/component")
 local Random = require("baqua/random")
 
+local LaserChart = require("sumika/components/laser_chart")
 local MinigameButton = require("sumika/components/minigame_button")
 local Nines = require("sumika/minigames/nines/init")
 local Parkour = require("sumika/components/parkour")
@@ -79,6 +80,15 @@ local First = class extends SumikaStage {
             position = Vector(-1952, -36, 64),
             angles = QAngle(0, 270, 0),
             minigame = nines
+        }))
+
+        e.addChild("laserChart", LaserChart({
+            hitPosition = Vector(10240, 2048, 283),
+            noteChartPath = "charts/4243e617f722204d6f8a160647c5fe5e_1",
+            playerHandlers = this.playerHandlers,
+            onComplete = function() {
+
+            }
         }))
     }
 

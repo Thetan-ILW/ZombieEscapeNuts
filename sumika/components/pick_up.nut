@@ -105,17 +105,6 @@ class PickUp extends EntityContainer {
     }
 
     function update() {
-        if (!this.followEntity) {
-            trace.start = this.currentPosition
-            trace.end = this.currentPosition
-            TraceHull(trace)
-
-            if (trace.hit && trace.enthit.IsPlayer()) {
-                trace.hit = null
-                this.pickUp(trace.enthit)
-            }
-        }
-
         local destination = this.initialPosition
 
         if (this.followEntity) {
@@ -142,6 +131,18 @@ class PickUp extends EntityContainer {
             entity.SetAbsOrigin(visual_position)
             entity.SetAbsAngles(angle)
         }
+
+        if (!this.followEntity) { // Check for collision here because this.pickUp() can kill this component
+            trace.start = this.currentPosition
+            trace.end = this.currentPosition
+            TraceHull(trace)
+
+            if (trace.hit && trace.enthit.IsPlayer()) {
+                trace.hit = null
+                this.pickUp(trace.enthit)
+            }
+        }
+
     }
 
     function getPosition() {
@@ -150,9 +151,11 @@ class PickUp extends EntityContainer {
 
     function receive(event) {
         if (event.name == GameEvent.EntityLimitReached) {
-            this.orbEntity.Kill()
-            this.orbEntity = null
-            this.removeEntity("orb")
+            if (this.orbEntity) {
+                this.orbEntity.Kill()
+                this.orbEntity = null
+                this.removeEntity("orb")
+            }
         }
     }
 }

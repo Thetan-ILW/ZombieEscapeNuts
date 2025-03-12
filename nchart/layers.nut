@@ -110,7 +110,7 @@ class Layers {
         local points = []
 
         if (timing_points.len() == 1) {
-            points.append(Point(timing_points[0].absoluteTime, 120*60, 1.0))
+            points.append(LayerPoint(timing_points[0].absoluteTime, 120*60, 1.0))
             this.absolute = points
             return
         }
