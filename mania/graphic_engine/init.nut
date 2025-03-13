@@ -73,9 +73,9 @@ class GraphicEngine {
                 continue
             }
 
-            local dt = (note.getVisualTime() - this.visualCurrentTime) * this.scrollSpeed
-            local adt = (note.getAbsoluteTime() - this.absoluteCurrentTime) * this.scrollSpeed
-            note.update(adt, dt)
+            local dt = note.getVisualTime() - this.visualCurrentTime
+            local adt = note.getAbsoluteTime() - this.absoluteCurrentTime
+            note.update(adt, dt, adt * this.scrollSpeed, dt * this.scrollSpeed)
         }
     }
 }

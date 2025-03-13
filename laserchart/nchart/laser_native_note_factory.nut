@@ -4,10 +4,12 @@ local LaserNote = require("laserchart/nchart/laser_note")
 local Random = require("baqua/random")
 
 local LaserNativeNoteFactory = class extends NoteFactory {
+    playfieldRadius = 1
     previousTime = -math.huge
     random = null
 
-    constructor() {
+    constructor(playfield_radius) {
+        this.playfieldRadius = playfield_radius
         this.previousTime = -math.huge
         this.random = Random(69133769)
     }
@@ -20,8 +22,8 @@ local LaserNativeNoteFactory = class extends NoteFactory {
             r = 2 - u;
         }
         return Vector2D(
-            (r * cos(t)),
-            (r * sin(t))
+            (r * cos(t)) * this.playfieldRadius,
+            (r * sin(t)) * this.playfieldRadius
         )
     }
 

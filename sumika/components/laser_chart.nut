@@ -7,6 +7,7 @@ local ChartImporter = require("nchart/chart_importer")
 local LaserNativeNoteFactory = require("laserchart/nchart/laser_native_note_factory")
 local GraphicalNoteFactory = require("laserchart/graphic_engine/note_factory")
 local GraphicEngine = require("mania/graphic_engine/init")
+local CollisionHandler = require("laserchart/scoring/collision_handler")
 local TemplateSpawner = require("baqua/template_spawner")
 
 local LaserChart = class extends Component {
@@ -16,9 +17,12 @@ local LaserChart = class extends Component {
     playerHandlers = null
     onComplete = null
     playerSpeed = 1.3
+    playfieldRadius = 300
+    prepareTime = 5
 
     laserChart = null
     graphicEngine = null
+    collisionHandlers = null
     startTime = math.huge
 
     playerManagerEntity = null
@@ -26,7 +30,7 @@ local LaserChart = class extends Component {
     currentPointIndex = 0
 
     function load() {
-        local note_factory = LaserNativeNoteFactory()
+        local note_factory = LaserNativeNoteFactory(this.playfieldRadius)
         local importer = ChartImporter(note_factory)
         local note_chart_table = require(this.noteChartPath)
         this.laserChart = importer.import(note_chart_table)
@@ -36,7 +40,7 @@ local LaserChart = class extends Component {
             [LaserType.Small] = TemplateSpawner(Entities.FindByName(null, "laser_small_template")),
             [LaserType.SmallBlade] = TemplateSpawner(Entities.FindByName(null, "laser_blade_small_template")),
             [LaserType.LargeBlade] = TemplateSpawner(Entities.FindByName(null, "laser_blade_large_template")),
-            [LaserType.Cross] = TemplateSpawner(Entities.FindByName(null, "laser_blade_large_template")),
+            [LaserType.Cross] = TemplateSpawner(Entities.FindByName(null, "laser_cross_template")),
         }
 
         this.graphicEngine = GraphicEngine(GraphicalNoteFactory(template_spawners, this.hitPosition))
@@ -64,20 +68,39 @@ local LaserChart = class extends Component {
 
         local stage = this.getStage()
         this.playerManagerEntity = Entities.FindByClassname(null, "cs_player_manager")
+        this.collisionHandlers = {}
 
         foreach (player_handler in this.playerHandlers) {
             local player_entity = player_handler.entity
-            local lerp = NetProps.GetPropFloat(player_entity, "m_fLerpTime")
             NetProps.SetPropFloat(player_entity, "m_flLaggedMovementValue", this.playerSpeed)
 
-            EmitSoundEx({
-                sound_name = audio,
-                entity = player_entity
-                filter_type = 4,
-            })
+            this.collisionHandlers[player_handler] <- CollisionHandler(
+                this.laserChart.notes,
+                player_handler,
+                this.hitPosition,
+                this
+            )
+            this.collisionHandlers[player_handler].setCollisionDeltaTime(1)
+
+            local function playMusic() {
+                EmitSoundEx({
+                    sound_name = audio,
+                    entity = player_entity
+                    filter_type = 4,
+                })
+            }
+
+            if (this.prepareTime == 0) {
+                playMusic()
+            }
+            else {
+                stage.addEvent(this.prepareTime, function () {
+                    playMusic()
+                })
+            }
         }
 
-        this.startTime = Time()
+        this.startTime = Time() + this.prepareTime
     }
 
     function update() {
@@ -107,10 +130,12 @@ local LaserChart = class extends Component {
         this.graphicEngine.setPoints(absolute_point, visual_point)
         this.graphicEngine.update()
 
-        foreach(player_handler in this.playerHandlers) {
+        foreach(player_handler, collision_handler in this.collisionHandlers) {
             local player_entity = player_handler.entity
             local ping = NetProps.GetPropIntArray(this.playerManagerEntity, "m_iPing", player_entity.entindex()) * 0.001
             local lerp = NetProps.GetPropFloat(player_entity, "m_fLerpTime")
+            collision_handler.setTime(current_time + ping + lerp)
+            collision_handler.update()
         }
 
         if (current_time > this.laserChart.maxTime + 1) {

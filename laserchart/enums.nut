@@ -5,8 +5,3 @@ enum LaserType {
     LargeBlade,
     Cross,
 }
-
-enum LaserHitboxType {
-    Circle,
-    Line
-}

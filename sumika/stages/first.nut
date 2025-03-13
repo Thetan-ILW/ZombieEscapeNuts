@@ -82,6 +82,7 @@ local First = class extends SumikaStage {
             minigame = nines
         }))
 
+        /*
         e.addChild("laserChart", LaserChart({
             hitPosition = Vector(10240, 2048, 283),
             noteChartPath = "charts/4243e617f722204d6f8a160647c5fe5e_1",
@@ -90,6 +91,7 @@ local First = class extends SumikaStage {
 
             }
         }))
+            */
     }
 
     function infiltration() {

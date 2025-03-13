@@ -1,36 +1,31 @@
 local GraphicalNote = require("mania/graphic_engine/graphical_note")
 
-local HARDCODED_VALUE = 300
-
 class GraphicalLaserNote extends GraphicalNote {
     function getFullColor() {
         switch(this.note.type) {
             case LaserType.Large:
-                return 0xff80fffb
+                return [1, 1, 0.5, 1]
             case LaserType.Small:
-                return 0xffffe980
+                return [0.5, 1, 1, 1]
             case LaserType.SmallBlade:
-                return 0xffff808f
+                return [0.56, 0.5, 1, 1]
             case LaserType.LargeBlade:
-                return 0xfff580ff
+                return [1, 0.5, 1, 1]
             default:
-                return 0xffffffff
+                return [1, 1, 1, 1]
         }
     }
 
-    function update(absolute_delta_time, visual_delta_time) {
-        local x = (this.note.position.x * HARDCODED_VALUE) + this.position.x
-        local y = (this.note.position.y * HARDCODED_VALUE) + this.position.y
-        local z = absolute_delta_time + this.position.z
+    function update(absolute_delta_time, visual_delta_time, scaled_absolute_delta_time, scaled_visual_delta_time) {
+        local x = this.note.position.x + this.position.x
+        local y = this.note.position.y + this.position.y
+        local z = scaled_visual_delta_time + this.position.z
         this.entity.SetAbsOrigin(Vector(x, y, z))
 
-        if (absolute_delta_time <= 0) {
-            NetProps.SetPropInt(this.entity, "m_clrRender", this.getFullColor())
-        }
-        else {
-            NetProps.SetPropInt(this.entity, "m_clrRender", 0x44444444)
-        }
-
+        local color = getFullColor()
+        local a = absolute_delta_time * absolute_delta_time
+        color[3] = math.max(0.2, 1 - a)
+        world.setEntityColor(this.entity, color)
     }
 
     function spawn() {
