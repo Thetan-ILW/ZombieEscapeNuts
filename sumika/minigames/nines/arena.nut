@@ -4,6 +4,11 @@ local Arena = class {
     timeLimit = 30
     enemies = null
     walls = null
+
+    constructor() {
+        this.enemies = []
+        this.walls = []
+    }
 }
 
 module <- Arena

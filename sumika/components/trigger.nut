@@ -65,7 +65,7 @@ class Trigger extends EntityContainer {
             spawnflags = 1
         }
 
-        local name_format = "line%i_" + Time().tostring()
+        local name_format = origin.tostring() + "line%i_" + Time().tostring()
         foreach(i, position in positions) {
             local name = format(name_format, i)
             params.targetname = name

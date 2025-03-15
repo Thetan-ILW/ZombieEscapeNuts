@@ -28,7 +28,7 @@ local Enemy = class extends Character {
         PrecacheModel(enemy_purple_bullet)
     }
 
-    function followTriangle() {
+    function followTriangle(move = true) {
         local target_position = this.targetTriangle.GetOrigin()
         local current_position = this.entity.GetOrigin()
         local dx = target_position.x - current_position.x
@@ -36,6 +36,9 @@ local Enemy = class extends Character {
         local radians = atan2(dy, dx)
         local degrees = radians * (180 / PI)
         this.entity.SetAbsAngles(QAngle(0, degrees - 90, 0))
+
+        if (!move)
+            return
 
         if (abs(dx) + abs(dy) < 50) {
             return
@@ -110,6 +113,7 @@ local Enemy = class extends Character {
 
         switch (this.ai) {
             case NinesEnemyAi.None:
+                this.followTriangle(false)
                 break
             case NinesEnemyAi.FollowPlayer:
                 this.followTriangle()

@@ -12,6 +12,7 @@ class Nines extends Minigame {
 
     triangle = null
     enemies = null
+    walls = null
     text = null
 
     bulletSpeed = 5
@@ -29,6 +30,7 @@ class Nines extends Minigame {
         this.bullets = {}
         this.triangle = null
         this.enemies = {}
+        this.walls = []
     }
 
     function addPlayer(player) {
@@ -71,6 +73,14 @@ class Nines extends Minigame {
             )
         }
 
+        local wall_spawner = TemplateSpawner(Entities.FindByName(null, "nines_wall_template"))
+        foreach (params in this.arena.walls) {
+            local wall = wall_spawner.spawn()
+            wall.SetAbsOrigin(params.position)
+            wall.SetAbsAngles(params.angle)
+            this.walls.append(wall)
+        }
+
         this.startTime = Time()
     }
 
@@ -81,9 +91,13 @@ class Nines extends Minigame {
         foreach (bullet in this.bullets) {
             bullet.kill()
         }
+        foreach (wall in this.walls) {
+            wall.Kill()
+        }
 
         this.enemies.clear()
         this.bullets.clear()
+        this.walls.clear()
 
         if (this.triangle) {
             this.triangle.kill()

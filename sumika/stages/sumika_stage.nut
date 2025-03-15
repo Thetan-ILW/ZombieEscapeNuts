@@ -76,7 +76,7 @@ local SumikaStage = class extends Stage {
                 local player_handler = _this.getPlayerHandler(player_entity)
                 local consumed = player_handler.consumePickUps(trigger_name)
 
-                if (consumed == 0) {
+                if (consumed == 0 && keys_to_open > 0) {
                     return
                 }
 
@@ -109,7 +109,7 @@ local SumikaStage = class extends Stage {
         thread.coro(function () {
             parkour.spawnAnimatedAsync()
             foreach(i, position in shrine_positions) {
-                parent.addChild(format("key%i", i), _this.Key(position + Vector(0, 0, -40), "door"))
+                parent.addChild(format("key%i", i), _this.Key(position + Vector(0, 0, -40), trigger_name))
             }
         })
 

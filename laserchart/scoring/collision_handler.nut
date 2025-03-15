@@ -4,7 +4,7 @@ local CollisionHandler = class {
     playerHandler = null
     playfieldHitPosition = null
     game = null
-    collisionDeltaTime = 1
+    collisionDeltaTime = 0.95
     playerRadius = 24.5
     currentTime = -math.huge
 

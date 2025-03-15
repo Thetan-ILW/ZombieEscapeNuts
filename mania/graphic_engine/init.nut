@@ -67,7 +67,7 @@ class GraphicEngine {
         for (local i = this.startDrawIndex; i < this.currentNoteIndex; i++) {
             local note = this.graphicalNotes[i]
 
-            if (current_time > note.getAbsoluteTime() + kill_time) {
+            if (this.visualCurrentTime > note.getVisualTime() + kill_time) {
                 note.kill()
                 this.startDrawIndex = i + 1
                 continue

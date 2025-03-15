@@ -26,7 +26,7 @@ local First = class extends SumikaStage {
 
         local function openDoors() {
             _this.say("Both ways will open in 20 seconds!")
-            _this.say("Get ready for a split defense, both sides would have to hack the terminals.")
+            _this.say("Get ready for a split defense.")
             _this.addEvent(20, function() {
                 _this.breakDoor("s1_entrance_door")
                 _this.breakDoor("s1_entrance_left_door")
@@ -81,22 +81,90 @@ local First = class extends SumikaStage {
             angles = QAngle(0, 270, 0),
             minigame = nines
         }))
-
-        /*
-        e.addChild("laserChart", LaserChart({
-            hitPosition = Vector(10240, 2048, 283),
-            noteChartPath = "charts/4243e617f722204d6f8a160647c5fe5e_1",
-            playerHandlers = this.playerHandlers,
-            onComplete = function() {
-
-            }
-        }))
-            */
     }
 
     function infiltration() {
+        local _this = this
         local e = addChild("infiltration", Component())
         local key_count = addParkourWithKeys(e, this.rng.nextElement(parkours.leftInfiltration), "leftStairs")
+
+        local left_door_triggered = false
+        local right_door_triggered = false
+
+        local function openDoors() {
+            _this.breakDoor("s1_outside_left_field")
+            _this.breakDoor("s1_entrance_hq_door1")
+            _this.say("The doors are open! The building seems to be open, enter the elevator and wait for a bit.")
+            _this.addEvent(2, function () {
+                _this.killTree()
+            })
+
+            this.building()
+        }
+
+        e.addChild("leftTrigger", KeyTrigger(
+            Vector(-2664, 2260, 80),
+            Vector(192, 216, 128),
+            "leftStairs",
+            key_count,
+            function(trigger, player) {
+                left_door_triggered = true
+
+                if (right_door_triggered)
+                    openDoors()
+                else
+                    _this.say("Waiting for the team on the right to hack the terminal.")
+            }
+        ))
+
+        local nines = e.addChild("ninesRight", Nines({
+            arena = this.rng.nextElement(nines_arenas),
+            onComplete = function(player) {
+                local player_handler = _this.getPlayerHandler(player)
+                Say(null, format("%s hacked the right door.", player_handler.getUsername()), false)
+                right_door_triggered = true
+
+                if (left_door_triggered)
+                    openDoors()
+                else
+                    _this.say("Waiting for the team on the right to collect the keys.")
+            }
+        }))
+
+        e.addChild("ninesButtonRight", MinigameButton({
+            position = Vector(-732, 4112, 64),
+            angles = QAngle(),
+            minigame = nines
+        }))
+    }
+
+    function building() {
+        local _this = this
+        local e = addChild("building", Component())
+
+        e.addChild("trigger", Trigger(
+            Vector(-3616, 3840, 320),
+            Vector(192, 192, 128),
+            function(trigger, player_entity) {
+                _this.say("Hurry up, the elevator is leaving in 20 seconds.")
+
+                trigger.killTree()
+                local xd = _this.rng.chance(10)
+
+                if (xd) {
+                    _this.addEvent(10, function() {
+                        _this.say("Oops! We are leaving earlier than I said, sorry.")
+                        EntFire("s1_inside_elevator", "Close", "", 0, null)
+                    })
+                }
+                else {
+                    _this.addEvent(20, function() {
+                        _this.say("Bye bye, zombies!")
+                        EntFire("s1_inside_elevator", "Close", "", 0, null)
+                    })
+                }
+            }
+        ))
     }
 
     function load() {
@@ -108,7 +176,16 @@ local First = class extends SumikaStage {
             outside.addChild(format("blueArchive%i", i), BlueArchive(Vector(params[0], params[1], params[2])))
         }
 
-        this.entrance()
+        //this.entrance()
+        this.building()
+
+        /*
+        addChild("laserChart", LaserChart({
+            hitPosition = Vector(10240, 2048, 283),
+            playerHandlers = this.playerHandlers,
+            noteChartPath = "charts/0b86a323c86e69dd05a2944d0d9ce666_1"
+        }))
+            */
     }
 }
 
