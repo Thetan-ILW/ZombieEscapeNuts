@@ -156,7 +156,7 @@ local LaserChart = class extends Component {
         }
 
         this.killTree()
-        this.onComplete()
+        //this.onComplete()
     }
 }
 

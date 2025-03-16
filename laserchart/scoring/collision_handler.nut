@@ -76,12 +76,11 @@ local CollisionHandler = class {
         local dx = half_length * cos(angle_radians)
         local dy = half_length * sin(angle_radians)
 
-        local start_point = {x = line_origin.x - dx, y = line_origin.y - dy}
-        local end_point = {x = line_origin.x + dx, y = line_origin.y + dy}
+        local start_point = Vector2D(line_origin.x - dx, line_origin.y - dy)
+        local end_point = Vector2D(line_origin.x + dx, line_origin.y + dy)
 
-        local line_vector = {x = end_point.x - start_point.x, y = end_point.y - start_point.y}
-
-        local center_vector = {x = circle_center.x - start_point.x, y = circle_center.y - start_point.y}
+        local line_vector = end_point - start_point
+        local center_vector = circle_center - start_point
 
         local dot_product = center_vector.x * line_vector.x + center_vector.y * line_vector.y
         local line_vector_squared = pow(line_vector.x, 2) + pow(line_vector.y, 2)
@@ -95,10 +94,10 @@ local CollisionHandler = class {
             t = 1
         }
 
-        local closest_point = {
-            x = start_point.x + t * line_vector.x,
-            y = start_point.y + t * line_vector.y
-        }
+        local closest_point = Vector2D(
+            start_point.x + t * line_vector.x,
+            start_point.y + t * line_vector.y
+        )
 
         local dx_closest = circle_center.x - closest_point.x
         local dy_closest = circle_center.y - closest_point.y

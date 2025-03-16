@@ -154,12 +154,14 @@ local First = class extends SumikaStage {
                 if (xd) {
                     _this.addEvent(10, function() {
                         _this.say("Oops! We are leaving earlier than I said, sorry.")
+                        e.killTree()
                         EntFire("s1_inside_elevator", "Close", "", 0, null)
                     })
                 }
                 else {
                     _this.addEvent(20, function() {
                         _this.say("Bye bye, zombies!")
+                        e.killTree()
                         EntFire("s1_inside_elevator", "Close", "", 0, null)
                     })
                 }
@@ -176,14 +178,13 @@ local First = class extends SumikaStage {
             outside.addChild(format("blueArchive%i", i), BlueArchive(Vector(params[0], params[1], params[2])))
         }
 
-        //this.entrance()
-        this.building()
+        this.entrance()
 
         /*
         addChild("laserChart", LaserChart({
             hitPosition = Vector(10240, 2048, 283),
             playerHandlers = this.playerHandlers,
-            noteChartPath = "charts/0b86a323c86e69dd05a2944d0d9ce666_1"
+            noteChartPath = "charts/54268afb5416f82845b6b7bf416bc5db_1"
         }))
             */
     }
